@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Enkel Snitt Kalkulator</title>
+    <style>
+        :root {
+            --background-color: #f8f8f8;
+            --text-color: #333;
+            --link-color: #4caf50;
+            --button-background: #4caf50;
+            --footer-background: #f2f2f2;
+            --footer-color: #333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #333;
+                --text-color: #fff;
+                --link-color: #77dd77;
+                --button-background: #77dd77;
+                --footer-background: #333;
+                --footer-color: #fff;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--link-color);
+            margin-bottom: 20px;
+        }
+
+        b {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            resize: vertical;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: var(--button-background);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        ol {
+            counter-reset: my-counter;
+            list-style: none;
+            padding-left: 0;
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            text-align: center;
+            display: inline-block;
+        }
+
+        li {
+            position: relative;
+            counter-increment: my-counter;
+            margin-bottom: 10px;
+            padding-left: 30px;
+            text-align: left;
+        }
+
+        ol li:before {
+            content: counter(my-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            color: var(--link-color);
+        }
+
+        ul li:before {
+            position: absolute;
+            left: 0;
+            top: 0;
+            content: "•";
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            color: var(--link-color);
+            display: inline-block;
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+
+        #instructions {
+            text-align: center;
+        }
+
+        footer {
+            background-color: var(--footer-background);
+            color: var(--footer-color);
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--text-color);
+            font-style: italic;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: red;
+        }
+    </style>
+    <script>
+        // Grade values mapping
+        const gradeValues = {
+            A: 5,
+            B: 4,
+            C: 3,
+            D: 2,
+            E: 1,
+            F: 0
+        };
+
+        // Array to store grade objects
+        let gradeArray = [];
+
+        // Calculation function triggered by input change or button click
+        const calculate = () => {
+            // Retrieve input text from textarea
+            const text = document.getElementById("inputField").value;
+
+            // Check if the input field is empty
+            if (text.trim() === "") {
+                alert("Vennligst fyll ut karakterfeltet.");
+                return;
+            }
+
+            // Variables to store final grade and number of elements
+            let tempGrade = 0;
+            let tempWeigth = 0.0;
+            let totalWeigth = 0.0;
+
+
+            // Split the text into rows
+            const rows = text.split('\n');
+
+            // Determine the starting index for iteration based on the presence of a header row
+            let i = 0;
+            if (text.includes("Emnekode")) {
+                i = 1;
+            }
+
+            // Iterate over each row starting from index 1 (to skip the header row) or 0 if the header row is not present
+            for (; i < rows.length; i++) {
+                const columns = rows[i].split('\t');
+                const aWeight = columns[3];
+                const aGrade = columns[4];
+
+                // Push the values to the array as an object
+                const obj = {
+                    weight: parseFloat(aWeight),
+                    grade: aGrade
+                };
+                gradeArray.push(obj);
+            }
+
+            // Calculate the final grade by multiplying grade value and weight for each object in the array
+            for (let obj of gradeArray) {
+                const grade = gradeValues[obj.grade] * obj.weight;
+                totalWeigth += obj.weight;
+                // Source https://www.oslomet.no/studier/soknad-og-opptak/poengberegning-rangeringsregler
+
+                // Check if the grade is a valid number
+                if (!isNaN(grade) && Number.isInteger(grade)) {
+                    tempGrade += grade;
+                    tempWeigth += obj.weight;
+                }
+            }
+            // Calculate the average grade and display the result
+            const finalGrade = ((tempGrade / tempWeigth)).toFixed(2);
+            document.getElementById("result").innerHTML = `Voilà!😎 Ditt snitt er ${finalGrade} av totalt ${totalWeigth} studie poeng`;
+
+            // Reset the gradeArray for future calculations
+            gradeArray = [];
+        }
+
+        // Event listeners for input change and button click
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputField = document.getElementById("inputField");
+            inputField.addEventListener("input", calculate);
+            const calculateButton = document.getElementById("calculateButton");
+            calculateButton.addEventListener("click", calculate);
+        });
+    </script>
+
+</head>
+
+<body>
+    <h1>Enkel Snitt Kalkulator</h1>
+    <div id="form">
+        <b> For å finne ditt snitt gjør følgende</b>
+        <ol id="instructions">
+            <li>Logg inn på <a href="https://sok.samordnaopptak.no/">Samordnaopptak</a></li>
+            <li>Naviger fra "Gå til dokumentasjon" til Høyre utdanning eller trykk <a
+                    href="https://sok.samordnaopptak.no/#/documentation" target="noreferrer noopener">her</a></li>
+            <li>Kopier hele tabellen som vist under og lim den inn i tekstfeltet</li>
+            <li>Trykk "Beregn snittet mitt"</li>
+        </ol>
+
+        <br>
+        <label for="inputField">Karakter fra Samordnaopptak</label>
+        <textarea type="text" id="inputField" placeholder="Emnekode	Emne	Termin	Poeng	Karakter
+    ADSE2100	Menneske maskin interaksjon	2022 Høst	10	X
+    DAPE1400	Programmering	2021 Høst	10	X
+    DATA1500	Databaser	2022 Vår	10	X
+    DATA1700	Webprogrammering	2022 Vår	10	X
+    DAFE2200	Systemutvikling	2022 Høst	10	X
+    DATA1200	Webutvikling og inkluderende design	2021 Høst	5	X
+    ADSE1310	Internet of Things	2022 Vår	10	X
+    DATA2500	Operativsystemer	2023 Vår	10	X
+    ADTS2310	Testing av programvare	2023 Vår	10	X
+    DATA1100	Teknologi og samfunn for programmerere	2021 Høst	5	X
+    DATA2410	Datanettverk og skytjenester	2023 Vår	10	X
+    DATS2300	Algoritmer og datastrukturer	2022 Høst	10	X
+    DAPE1300	Diskret matematikk	2021 Høst	10	X" onchange="calculate()"></textarea>
+        <button id="calculateButton">Beregn snittet mitt</button>
+    </div>
+    <p id="result"></p>
+    <footer>
+        <p>Ingen av karakterene blir lagret eller sendt. Siden er ikke tilknyttet Samordna Opptak. Den er laget
+            fordi jeg selv var for lat å regne det ut selv 😋</p>
+        <p>Karakterene er kalkulert på følgende måte</p>
+        <p>Formel vektet gjennomsnitt</p>
+        <ul>
+            <li>Karakter A med 20 studiepoeng blir 5 x 20 = 100.</li>
+            <li>Karakter B med 10 studiepoeng blir 4 x 10 = 40.</li>
+            <li>Karakter B med 15 studiepoeng blir 4 x 15 = 60.</li>
+            <li>Karakter D med 10 studiepoeng blir 2 x 10 = 20.</li>
+        </ul>
+        <p> Den totale summen av alle karakterene deles deretter på antall studiepoeng. Hentet fra
+            <a href="https://www.oslomet.no/studier/soknad-og-opptak/poengberegning-rangeringsregler"> <i>OsloMet
+                    2023</i>
+            </a>
+        </p>
+        <p>Laget av <a href="https://github.com/rasmusjs">Rasmus</a>, gjerne send <a
+                href="mailto:rasmus.skramstad@gmail.com?subject=Feil på Enkel Snitt kalkulator">meg</a> en epost dersom
+            du opplever noe feil </p>
+    </footer>
+</body>
+<!-- Made by Rasmus https://github.com/rasmusjs -->
+</html>
