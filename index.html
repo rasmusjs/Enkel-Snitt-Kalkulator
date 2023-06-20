@@ -121,7 +121,7 @@
             position: absolute;
             left: 0;
             top: 0;
-            font-size: 2.vw;
+            font-size: 1vw;
             font-weight: bold;
             line-height: 1;
             color: var(--link-color);
@@ -132,7 +132,7 @@
             left: 0;
             top: 0;
             content: "•";
-            font-size: 2.4vw;
+            font-size: 1vw;
             font-weight: bold;
             line-height: 1;
             color: var(--link-color);
@@ -176,6 +176,17 @@
             F: 0
         };
 
+        const findLetterGrade = (number) => {
+            let roundedGrade = parseInt(Math.round(number))
+            for (const grade in gradeValues) {
+                if (gradeValues[grade] === roundedGrade) {
+                    return grade;
+                }
+            }
+            return null; // Return null if no grade matches the number
+        }
+
+
         // Array to store grade objects
         let gradeArray = [];
 
@@ -186,7 +197,7 @@
 
             // Check if the input field is empty
             if (text.trim() === "") {
-                alert("Vennligst fyll ut karakterfeltet.");
+                document.getElementById("result").innerHTML = ""
                 return;
             }
 
@@ -231,10 +242,18 @@
                     tempWeigth += obj.weight;
                 }
             }
+
+
             // Calculate the average grade and display the result
             const finalGrade = ((tempGrade / tempWeigth)).toFixed(2);
-            document.getElementById("result").innerHTML = `Voilà!😎 Ditt snitt er ${finalGrade} av totalt ${totalWeigth} studie poeng`;
 
+            if ((isNaN(finalGrade)) || isNaN(totalWeigth)) {
+                document.getElementById("result").innerHTML = `Noe gikk feil, forsto meg ikke på noen av karakterene`;
+            }
+            else {
+
+                document.getElementById("result").innerHTML = `Voilà!😎 Ditt snitt er ${finalGrade} av totalt ${totalWeigth} studiepoeng, dette tilsvarer en ${findLetterGrade(finalGrade)}`;
+            }
             // Reset the gradeArray for future calculations
             gradeArray = [];
         }
@@ -277,7 +296,7 @@
     DATA1100	Teknologi og samfunn for programmerere	2021 Høst	5	X
     DATA2410	Datanettverk og skytjenester	2023 Vår	10	X
     DATS2300	Algoritmer og datastrukturer	2022 Høst	10	X
-    DAPE1300	Diskret matematikk	2021 Høst	10	X" onchange="calculate()"></textarea>
+    DAPE1300	Diskret matematikk	2021 Høst	10	X"></textarea>
         <button id="calculateButton">Beregn snittet mitt</button>
     </div>
     <p id="result"></p>
@@ -299,7 +318,8 @@
         </p>
         <p>Laget av <a href="https://github.com/rasmusjs">Rasmus</a>, gjerne send <a
                 href="mailto:rasmus.skramstad@gmail.com?subject=Feil på Enkel Snitt kalkulator">meg</a> en epost dersom
-            du opplever noe feil </p>
+            du opplever noe feil. Eller endre det <a
+                href="https://github.com/rasmusjs/Enkel-Snitt-Kalkulator/tree/main">selv</a> på</p>
     </footer>
 </body>
 <!-- Made by Rasmus https://github.com/rasmusjs -->
